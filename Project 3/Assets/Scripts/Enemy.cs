@@ -15,6 +15,10 @@ public class Enemy : MonoBehaviour
     public GameObject EnemyBullet;
     public Transform shottingOffset;
 
+    public AudioSource soundEffect;
+    public AudioClip fire;
+    public AudioClip destroy;
+
     private void Start()
     {
         x = transform.position.x;
@@ -41,7 +45,8 @@ public class Enemy : MonoBehaviour
             {
                 GameObject shot = Instantiate(EnemyBullet, shottingOffset.position, Quaternion.identity);
                 Debug.Log("Bang!");
-
+                soundEffect.clip = fire;
+                soundEffect.Play();
                 Destroy(shot, 3f);
             }
             timer = 300;
@@ -49,9 +54,22 @@ public class Enemy : MonoBehaviour
         speed += 0.0001f;
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.name == "Bullet(Clone)")
+        {
+            if (collision.gameObject.name == "LeftWall")
+            {
+                goLeft = false;
+            }
+            if (collision.gameObject.name == "RightWall")
+            {
+                goLeft = true;
+                y = transform.position.y - 1;
+                transform.position = new Vector3(transform.position.x, y, transform.position.z);
+            }
+        }
+        if (collision.gameObject.name == "Bullet(Clone)")
         {
             if (gameObject.name == "Alien1")
             {
@@ -69,22 +87,11 @@ public class Enemy : MonoBehaviour
             {
                 GameObject.Find("GameManager").GetComponent<GameManager>().PlayerScored(10);
             }
-            Destroy(gameObject);
+            GetComponent<Animator>().SetTrigger("Destroy");
+            soundEffect.clip = destroy;
+            soundEffect.Play();
+            Destroy(gameObject, 2.5f);
             Destroy(collision.gameObject);
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.name == "LeftWall")
-        {
-            goLeft = false;
-        }
-        if (collision.gameObject.name == "RightWall")
-        {
-            goLeft = true;
-            y = transform.position.y - 1;
-            transform.position = new Vector3(transform.position.x, y, transform.position.z);
         }
     }
 

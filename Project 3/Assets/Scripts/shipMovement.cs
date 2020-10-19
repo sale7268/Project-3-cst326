@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class shipMovement : MonoBehaviour
 {
@@ -9,6 +10,12 @@ public class shipMovement : MonoBehaviour
 
     public GameObject bullet;
     public Transform shottingOffset;
+
+    //Sounds
+    public AudioSource soundEffect;
+    public AudioClip fire;
+    public AudioClip destroy;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,28 +35,44 @@ public class shipMovement : MonoBehaviour
         {
             GameObject shot = Instantiate(bullet, shottingOffset.position, Quaternion.identity);
             Debug.Log("Bang!");
-
+            soundEffect.clip = fire;
+            soundEffect.Play();
             Destroy(shot, 3f);
 
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.name == "EnemyBullet(Clone)")
-        {
-            Destroy(gameObject);
-            Destroy(collision.gameObject);
-            Debug.Log("Player loses life");
-        }
-    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.name == "EnemyBullet(Clone)")
         {
-            Destroy(gameObject);
+            GetComponent<Animator>().SetTrigger("Destroy");
+            soundEffect.clip = destroy;
+            soundEffect.Play();
+            Destroy(gameObject, 3.0f);
             Destroy(collision.gameObject);
             Debug.Log("Player loses life");
+            Invoke("loadScene", 2.0f);
         }
+        //StartCoroutine(loadNextScene());
+    }
+    //IEnumerator loadNextScene()
+    //{
+        //Debug.Log("Started Coroutine at timestamp : " + Time.time);
+        //yield return new WaitForSeconds(5);
+        //Debug.Log("Finished Coroutine at timestamp : " + Time.time);
+   // }
+
+    void loadScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        Invoke("Restart", 2.0f);
+    }
+    void Restart()
+    {
+        Application.LoadLevel(0);
     }
 }
+
+
+

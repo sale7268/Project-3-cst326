@@ -5,14 +5,6 @@ using UnityEngine;
 public class BarricadeDestroy : MonoBehaviour
 {
     // Start is called before the first frame update
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.name == "Bullet(Clone)" || collision.gameObject.name == "EnemyBullet(Clone)")
-        {
-            Destroy(gameObject);
-            Destroy(collision.gameObject);
-        }
-    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
